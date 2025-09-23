@@ -1,60 +1,25 @@
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.stream.Stream
 import kotlin.test.assertEquals
 
 class RomanNumeralsTest {
-    val underTest = RomanNumeralGenerator()
 
-    @Test
-    fun `one becomes I`() {
-        val result = underTest.convertTo(1)
-
-        assertEquals("I", result)
+    @ParameterizedTest
+    @ArgumentsSource(RomanNumeralsCsvProvider::class)
+    fun `number to numeral`(numeral: String, number: Int) {
+        assertEquals(numeral, RomanNumeralGenerator().convertTo(number))
     }
 
-    @Test
-    fun `two becomes II`() {
-        val result = underTest.convertTo(2)
-
-        assertEquals("II", result)
-    }
-
-    @Test
-    fun `three becomes III`() {
-        val result = underTest.convertTo(3)
-
-        assertEquals("III", result)
-    }
-
-    @Test
-    fun `four becomes IV`() {
-        val result = underTest.convertTo(4)
-
-        assertEquals("IV", result)
-    }
-
-    @Test
-    fun `wha tthe hell is 1499`() {
-        val result = underTest.convertTo(1499)
-
-        assertEquals("MCDXCIX", result)
-    }
-
-    @Test
-    fun `the rest`() {
-        assertEquals("V", underTest.convertTo(5))
-        assertEquals("VI", underTest.convertTo(6))
-        assertEquals("IX", underTest.convertTo(9))
-        assertEquals("X", underTest.convertTo(10))
-        assertEquals("XL", underTest.convertTo(40))
-        assertEquals("LX", underTest.convertTo(60))
-        assertEquals("C", underTest.convertTo(100))
-        assertEquals("XC", underTest.convertTo(90))
-        assertEquals("D", underTest.convertTo(500))
-        assertEquals("CD", underTest.convertTo(400))
-        assertEquals("M", underTest.convertTo(1000))
-        assertEquals("CM", underTest.convertTo(900))
-        assertEquals("MMCMXCIX", underTest.convertTo(2999))
-        assertEquals("MMM", underTest.convertTo(3000))
+    @ParameterizedTest
+    @ArgumentsSource(RomanNumeralsCsvProvider::class)
+    fun `numeral to number`(numeral: String, number: Int) {
+        assertEquals(number, RomanNumeralGenerator().convertFrom(numeral))
     }
 }
 
@@ -82,4 +47,27 @@ class RomanNumeralGenerator {
             val (howManyLeft, output) = acc
             howManyLeft % number to output + numeral.repeat(howManyLeft / number)
         }.second
+
+    fun convertFrom(string: String): Int =
+        numerals.fold(0 to string) { acc, numeralPair ->
+            val (number, numeral) = numeralPair
+            var (runningTotal, inputNumeral) = acc
+            while (inputNumeral.startsWith(numeral)) {
+                runningTotal += number
+                inputNumeral = inputNumeral.removeRange(0, numeral.length)
+            }
+            runningTotal to inputNumeral
+        }.first
+}
+
+class RomanNumeralsCsvProvider : ArgumentsProvider {
+    override fun provideArguments(context: ExtensionContext): Stream<out Arguments> {
+        val path = Paths.get("src/test/resources/roman_numerals.csv")
+        return Files.lines(path)
+            .filter { it.isNotBlank() }
+            .map {
+                val (numeral, number) = it.split(",")
+                Arguments.of(numeral, number.toInt())
+            }
+    }
 }
