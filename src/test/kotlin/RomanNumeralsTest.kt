@@ -13,13 +13,25 @@ class RomanNumeralsTest {
     @ParameterizedTest
     @ArgumentsSource(RomanNumeralsCsvProvider::class)
     fun `number to numeral`(numeral: String, number: Int) {
-        assertEquals(numeral, RomanNumeralGenerator().convertTo(number))
+        assertEquals(numeral, RomanNumeralGenerator().arabicToRomanWithFold(number))
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(RomanNumeralsCsvProvider::class)
+    fun `number to numeral using replacement`(numeral: String, number: Int) {
+        assertEquals(numeral, RomanNumeralGenerator().arabicToRomanWithReplace(number))
     }
 
     @ParameterizedTest
     @ArgumentsSource(RomanNumeralsCsvProvider::class)
     fun `numeral to number`(numeral: String, number: Int) {
-        assertEquals(number, RomanNumeralGenerator().convertFrom(numeral))
+        assertEquals(number, RomanNumeralGenerator().romanToArabic(numeral))
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(RomanNumeralsCsvProvider::class)
+    fun `numeral to number using recursion`(numeral: String, number: Int) {
+        assertEquals(number, RomanNumeralGenerator().romanToArabicRecursively(numeral))
     }
 }
 
@@ -41,14 +53,30 @@ class RomanNumeralGenerator {
         1 to "I",
     )
 
-    fun convertTo(i: Int): String =
+    fun arabicToRomanWithReplace(i: Int): String =
+        "I".repeat(i)
+            .replace("I".repeat(1000), "M")
+            .replace("I".repeat(900), "CM")
+            .replace("I".repeat(500), "D")
+            .replace("I".repeat(400), "CD")
+            .replace("I".repeat(100), "C")
+            .replace("I".repeat(90), "XC")
+            .replace("I".repeat(50), "L")
+            .replace("I".repeat(40), "XL")
+            .replace("I".repeat(10), "X")
+            .replace("I".repeat(9), "IX")
+            .replace("I".repeat(5), "V")
+            .replace("I".repeat(4), "IV")
+            .replace("I".repeat(1), "I")
+
+    fun arabicToRomanWithFold(i: Int): String =
         numerals.fold(i to "") { acc, numeralPair ->
             val (number, numeral) = numeralPair
             val (howManyLeft, output) = acc
             howManyLeft % number to output + numeral.repeat(howManyLeft / number)
         }.second
 
-    fun convertFrom(string: String): Int =
+    fun romanToArabic(string: String): Int =
         numerals.fold(0 to string) { acc, numeralPair ->
             val (number, numeral) = numeralPair
             var (runningTotal, inputNumeral) = acc
@@ -58,6 +86,18 @@ class RomanNumeralGenerator {
             }
             runningTotal to inputNumeral
         }.first
+
+    fun romanToArabicRecursively(initialRoman: String): Int {
+        tailrec fun checkTheRest(input: String, acc: Int): Int {
+            for ((number, numeral) in numerals) {
+                if (input.startsWith(numeral)) {
+                    return checkTheRest(input.removePrefix(numeral), acc + number)
+                }
+            }
+            return acc
+        }
+        return checkTheRest(initialRoman, 0)
+    }
 }
 
 class RomanNumeralsCsvProvider : ArgumentsProvider {
