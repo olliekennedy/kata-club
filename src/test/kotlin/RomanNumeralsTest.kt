@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -10,28 +11,40 @@ import kotlin.test.assertEquals
 
 class RomanNumeralsTest {
 
-    @ParameterizedTest
-    @ArgumentsSource(RomanNumeralsCsvProvider::class)
-    fun `number to numeral`(numeral: String, number: Int) {
-        assertEquals(numeral, RomanNumeralGenerator().arabicToRomanWithFold(number))
+    @Nested
+    inner class ArabicToRoman {
+        @ParameterizedTest
+        @ArgumentsSource(RomanNumeralsCsvProvider::class)
+        fun `number to numeral`(numeral: String, number: Int) {
+            assertEquals(numeral, RomanNumeralGenerator().arabicToRomanWithFold(number))
+        }
+
+        @ParameterizedTest
+        @ArgumentsSource(RomanNumeralsCsvProvider::class)
+        fun `number to numeral using replacement`(numeral: String, number: Int) {
+            assertEquals(numeral, RomanNumeralGenerator().arabicToRomanWithReplace(number))
+        }
+
+        @ParameterizedTest
+        @ArgumentsSource(RomanNumeralsCsvProvider::class)
+        fun `number to numeral using replacement and fold`(numeral: String, number: Int) {
+            assertEquals(numeral, RomanNumeralGenerator().arabicToRomanWithReplaceAndFold(number))
+        }
     }
 
-    @ParameterizedTest
-    @ArgumentsSource(RomanNumeralsCsvProvider::class)
-    fun `number to numeral using replacement`(numeral: String, number: Int) {
-        assertEquals(numeral, RomanNumeralGenerator().arabicToRomanWithReplace(number))
-    }
+    @Nested
+    inner class RomanToArabic {
+        @ParameterizedTest
+        @ArgumentsSource(RomanNumeralsCsvProvider::class)
+        fun `numeral to number`(numeral: String, number: Int) {
+            assertEquals(number, RomanNumeralGenerator().romanToArabic(numeral))
+        }
 
-    @ParameterizedTest
-    @ArgumentsSource(RomanNumeralsCsvProvider::class)
-    fun `numeral to number`(numeral: String, number: Int) {
-        assertEquals(number, RomanNumeralGenerator().romanToArabic(numeral))
-    }
-
-    @ParameterizedTest
-    @ArgumentsSource(RomanNumeralsCsvProvider::class)
-    fun `numeral to number using recursion`(numeral: String, number: Int) {
-        assertEquals(number, RomanNumeralGenerator().romanToArabicRecursively(numeral))
+        @ParameterizedTest
+        @ArgumentsSource(RomanNumeralsCsvProvider::class)
+        fun `numeral to number using recursion`(numeral: String, number: Int) {
+            assertEquals(number, RomanNumeralGenerator().romanToArabicRecursively(numeral))
+        }
     }
 }
 
@@ -68,6 +81,14 @@ class RomanNumeralGenerator {
             .replace("I".repeat(5), "V")
             .replace("I".repeat(4), "IV")
             .replace("I".repeat(1), "I")
+
+    fun arabicToRomanWithReplaceAndFold(i: Int): String {
+        return "I".repeat(i).let { output ->
+            numerals.fold(output) { acc, pair ->
+                acc.replace("I".repeat(pair.first), pair.second)
+            }
+        }
+    }
 
     fun arabicToRomanWithFold(i: Int): String =
         numerals.fold(i to "") { acc, numeralPair ->
