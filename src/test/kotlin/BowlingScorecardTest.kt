@@ -41,16 +41,21 @@ class BowlingScorecardTest {
         assertEquals(190, scoreFor("91 91 91 91 91 91 91 91 91 919"))
     }
 
+    @Test
+    fun `strike that never materialised`() {
+        assertEquals(10, scoreFor("X. -- -- -- -- -- -- -- -- --."))
+    }
+
     private fun scoreFor(scorecard: String): Int {
         val frames = scorecard.split(" ")
         return frames.mapIndexed { index, frame ->
             frame.simpleScore().let {
-                it + if (it.isASpare()) scoreForNextBowl(frames, index) else 0
+                it + if (it.isAStrikeOrSpare()) scoreForNextBowl(frames, index) else 0
             }
         }.sum()
     }
 
-    private fun Int.isASpare(): Boolean = this == 10
+    private fun Int.isAStrikeOrSpare(): Boolean = this == 10
 
     private fun scoreForNextBowl(frames: List<String>, index: Int): Int =
         if (index == frames.size - 1)
@@ -60,5 +65,10 @@ class BowlingScorecardTest {
 
     private fun String.simpleScore(): Int = map { scoreForBowl(it) }.sum()
 
-    private fun scoreForBowl(ch: Char): Int = if (ch.isDigit()) ch.digitToInt() else 0
+    private fun scoreForBowl(ch: Char): Int =
+        when {
+            ch.isDigit() -> ch.digitToInt()
+            ch == 'X' -> 10
+            else -> 0
+        }
 }
