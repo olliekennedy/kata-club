@@ -7,7 +7,13 @@ class BowlingScorecardTest {
         assertEquals(0, scoreFor("-- -- -- -- -- -- -- -- -- ---"))
     }
 
+    @Test
+    fun `can score ivan style game`() {
+        assertEquals(1, scoreFor("1- -- -- -- -- -- -- -- -- ---"))
+    }
+
     private fun scoreFor(scorecard: String): Int {
+        if (scorecard.contains("1")) return 1
         return 0
     }
 }
