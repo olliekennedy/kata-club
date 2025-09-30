@@ -31,9 +31,23 @@ class BowlingScorecardTest {
         assertEquals(16, scoreFor("-- -- -- -- -- -- -- -- -- 193"))
     }
 
-    private fun scoreFor(scorecard: String): Int {
-        return scorecard.map { moo(it) }.sum() + moo(scorecard.last())
+    @Test
+    fun `spares all over the shop`() {
+        assertEquals(57, scoreFor("82 2- 82 -- -- 73 -7 -- -- 193"))
     }
 
-    private fun moo(ch: Char): Int = if (ch.isDigit()) ch.digitToInt() else 0
+    private fun scoreFor(scorecard: String): Int {
+        val frames = scorecard.split(" ")
+        return frames.mapIndexed { index, frame -> simpleScoreForFrame(frame) + if(simpleScoreForFrame(frame) == 10) scoreForNextBowl(frames, index) else 0 }.sum() + scoreForBowl(scorecard.last())
+    }
+
+    private fun scoreForNextBowl(frames: List<String>, index: Int): Int =
+        if (index == frames.size - 1)
+            0
+        else
+            scoreForBowl(frames[index + 1].first())
+
+    private fun simpleScoreForFrame(frame: String): Int = frame.map { scoreForBowl(it) }.sum()
+
+    private fun scoreForBowl(ch: Char): Int = if (ch.isDigit()) ch.digitToInt() else 0
 }
