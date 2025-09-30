@@ -57,22 +57,43 @@ class BowlingScorecardTest {
     }
 
     @Test
+    fun `two strikes in a row`() {
+        assertEquals(39, scoreFor("X. X. 3- -- -- -- -- -- -- --."))
+    }
+
+    @Test
+    fun `random game`() {
+        assertEquals(166, scoreFor("52 19 81 X. X. 82 54 X. 91 X91"))
+    }
+
+    @Test
     fun `turkey in final frame`() {
         assertEquals(30, scoreFor("-- -- -- -- -- -- -- -- -- XXX"))
     }
 
     private fun scoreFor(scorecard: String): Int {
         val frames = scorecard.split(" ")
-        return frames.mapIndexed { index, frame ->
+        val mapIndexed = frames.mapIndexed { index, frame ->
             frame.simpleScore().let {
-                it
-                    .plus(if (it.isAStrikeOrSpare()) scoreForNextBowl(frames, index) else 0)
-                    .plus(if (frame.isAStrike()) scoreForSecondNextBowl(frames, index) else 0)
+                it + if (frame.isAStrike()) {
+                    calculateBonusesForStrike(frame, frames, index)
+                } else if (it.isASpare()) {
+                    scoreForNextBowl(frames, index)
+                } else {
+                    0
+                }
             }
-        }.sum()
+        }
+        return mapIndexed.sum()
     }
 
-    private fun Int.isAStrikeOrSpare(): Boolean = this == 10
+    private fun calculateBonusesForStrike(frame: String, frames: List<String>, index: Int): Int =
+            if (frames[index + 1].isAStrike())
+                scoreForNextBowl(frames, index) + scoreForNextBowl(frames, index + 1)
+            else
+                scoreForNextBowl(frames, index) + scoreForSecondNextBowl(frames, index)
+
+    private fun Int.isASpare(): Boolean = this == 10
 
     private fun String.isAStrike(): Boolean = this.contains("X")
 
