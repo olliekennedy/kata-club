@@ -46,6 +46,11 @@ class BowlingScorecardTest {
         assertEquals(10, scoreFor("X. -- -- -- -- -- -- -- -- --."))
     }
 
+    @Test
+    fun `strike that materialises slightly`() {
+        assertEquals(20, scoreFor("X. 5- -- -- -- -- -- -- -- --."))
+    }
+
     private fun scoreFor(scorecard: String): Int {
         val frames = scorecard.split(" ")
         return frames.mapIndexed { index, frame ->
