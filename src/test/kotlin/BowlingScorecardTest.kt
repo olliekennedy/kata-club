@@ -21,10 +21,12 @@ class BowlingScorecardTest {
         assertEquals(score * 2, scoreFor("$score$score -- -- -- -- -- -- -- -- ---"))
     }
 
+    @Test
+    fun `not just beginners luck`() {
+        assertEquals(14, scoreFor("-3 -- 2- -- 6- -- -- -- 21 ---"))
+    }
+
     private fun scoreFor(scorecard: String): Int {
-        var score = 0
-        if (scorecard[0].isDigit()) score += scorecard[0].digitToInt()
-        if (scorecard[1].isDigit()) score += scorecard[1].digitToInt()
-        return score
+        return scorecard.map { if(it.isDigit()) it.digitToInt() else 0 }.sum()
     }
 }
