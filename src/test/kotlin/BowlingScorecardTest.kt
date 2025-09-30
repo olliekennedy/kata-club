@@ -51,22 +51,42 @@ class BowlingScorecardTest {
         assertEquals(20, scoreFor("X. 5- -- -- -- -- -- -- -- --."))
     }
 
+    @Test
+    fun `strike that completely materialises`() {
+        assertEquals(28, scoreFor("X. 54 -- -- -- -- -- -- -- --."))
+    }
+
+    @Test
+    fun `turkey in final frame`() {
+        assertEquals(30, scoreFor("-- -- -- -- -- -- -- -- -- XXX"))
+    }
+
     private fun scoreFor(scorecard: String): Int {
         val frames = scorecard.split(" ")
         return frames.mapIndexed { index, frame ->
             frame.simpleScore().let {
-                it + if (it.isAStrikeOrSpare()) scoreForNextBowl(frames, index) else 0
+                it
+                    .plus(if (it.isAStrikeOrSpare()) scoreForNextBowl(frames, index) else 0)
+                    .plus(if (frame.isAStrike()) scoreForSecondNextBowl(frames, index) else 0)
             }
         }.sum()
     }
 
     private fun Int.isAStrikeOrSpare(): Boolean = this == 10
 
+    private fun String.isAStrike(): Boolean = this.contains("X")
+
     private fun scoreForNextBowl(frames: List<String>, index: Int): Int =
         if (index == frames.size - 1)
             0
         else
             scoreForBowl(frames[index + 1].first())
+
+    private fun scoreForSecondNextBowl(frames: List<String>, index: Int): Int =
+        if (index == frames.size - 1)
+            0
+        else
+            scoreForBowl(frames[index + 1][1])
 
     private fun String.simpleScore(): Int = map { scoreForBowl(it) }.sum()
 
