@@ -90,8 +90,7 @@ class BowlingScorecardTest {
     private fun calculateBonusesForStrike(frames: List<String>, frameIndex: Int): Int =
         scoreForNextBowl(frames, frameIndex) + scoreForSecondNextBowl(frames, frameIndex)
 
-    private fun scoreForSecondNextBowl(frames: List<String>, index: Int): Int =
-        if (frames.getOrNull(index + 1)?.isAStrike() == true) {
+    private fun scoreForSecondNextBowl(frames: List<String>, index: Int): Int = if (frames.getOrNull(index + 1)?.isAStrike() == true) {
         scoreForFirstBowlInSecondNextFrame(frames, index)
     } else {
         scoreForSecondBowlInNextFrame(frames, index)
