@@ -88,10 +88,11 @@ class BowlingScorecardTest {
     }
 
     private fun calculateBonusesForStrike(frames: List<String>, index: Int): Int =
-            if (frames.getOrNull(index + 1) != null && frames[index + 1].isAStrike())
-                scoreForNextBowl(frames, index) + scoreForNextBowl(frames, index + 1)
-            else
-                scoreForNextBowl(frames, index) + scoreForSecondNextBowl(frames, index)
+        scoreForNextBowl(frames, index) + if (frames.getOrNull(index + 1)?.isAStrike() == true) {
+            scoreForNextBowl(frames, index + 1)
+        } else {
+            scoreForSecondNextBowl(frames, index)
+        }
 
     private fun Int.isASpare(): Boolean = this == 10
 
