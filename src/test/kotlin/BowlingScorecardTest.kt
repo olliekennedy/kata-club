@@ -76,7 +76,7 @@ class BowlingScorecardTest {
         val mapIndexed = frames.mapIndexed { index, frame ->
             frame.simpleScore().let {
                 it + if (frame.isAStrike()) {
-                    calculateBonusesForStrike(frame, frames, index)
+                    calculateBonusesForStrike(frames, index)
                 } else if (it.isASpare()) {
                     scoreForNextBowl(frames, index)
                 } else {
@@ -87,7 +87,7 @@ class BowlingScorecardTest {
         return mapIndexed.sum()
     }
 
-    private fun calculateBonusesForStrike(frame: String, frames: List<String>, index: Int): Int =
+    private fun calculateBonusesForStrike(frames: List<String>, index: Int): Int =
             if (frames.getOrNull(index + 1) != null && frames[index + 1].isAStrike())
                 scoreForNextBowl(frames, index) + scoreForNextBowl(frames, index + 1)
             else
