@@ -75,12 +75,10 @@ class BowlingScorecardTest {
         val frames = scorecard.split(" ")
         val mapIndexed = frames.mapIndexed { index, frame ->
             frame.simpleScore().let {
-                it + if (frame.isAStrike()) {
-                    calculateBonusesForStrike(frames, index)
-                } else if (it.isASpare()) {
-                    scoreForNextBowl(frames, index)
-                } else {
-                    0
+                it + when {
+                    frame.isAStrike() -> calculateBonusesForStrike(frames, index)
+                    it.isASpare() -> scoreForNextBowl(frames, index)
+                    else -> 0
                 }
             }
         }
