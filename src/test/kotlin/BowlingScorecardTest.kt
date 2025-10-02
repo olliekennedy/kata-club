@@ -71,19 +71,18 @@ class BowlingScorecardTest {
         assertEquals(30, scoreFor("-- -- -- -- -- -- -- -- -- XXX"))
     }
 
-    private fun scoreFor(scorecard: String): Int {
-        val frames = scorecard.split(" ")
-        val mapIndexed = frames.mapIndexed { index, frame ->
-            frame.simpleScore().let {
-                it + when {
-                    frame.isAStrike() -> calculateBonusesForStrike(frames, index)
-                    it.isASpare() -> scoreForNextBowl(frames, index)
-                    else -> 0
+    private fun scoreFor(scorecard: String): Int =
+        scorecard.split(" ").let { frames ->
+            frames.mapIndexed { index, frame ->
+                frame.simpleScore().let {
+                    it + when {
+                        frame.isAStrike() -> calculateBonusesForStrike(frames, index)
+                        it.isASpare() -> scoreForNextBowl(frames, index)
+                        else -> 0
+                    }
                 }
-            }
+            }.sum()
         }
-        return mapIndexed.sum()
-    }
 
     private fun calculateBonusesForStrike(frames: List<String>, frameIndex: Int): Int =
         scoreForNextBowl(frames, frameIndex) + scoreForSecondNextBowl(frames, frameIndex)
