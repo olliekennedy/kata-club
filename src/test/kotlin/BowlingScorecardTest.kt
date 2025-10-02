@@ -87,12 +87,17 @@ class BowlingScorecardTest {
         return mapIndexed.sum()
     }
 
-    private fun calculateBonusesForStrike(frames: List<String>, index: Int): Int =
-        scoreForNextBowl(frames, index) + if (frames.getOrNull(index + 1)?.isAStrike() == true) {
-            scoreForNextBowl(frames, index + 1)
-        } else {
-            scoreForSecondNextBowl(frames, index)
-        }
+    private fun calculateBonusesForStrike(frames: List<String>, frameIndex: Int): Int =
+        scoreForNextBowl(frames, frameIndex) + scoreForSecondNextBowl(frames, frameIndex)
+
+    private fun scoreForSecondNextBowl(frames: List<String>, index: Int): Int =
+        if (frames.getOrNull(index + 1)?.isAStrike() == true) {
+        scoreForFirstBowlInSecondNextFrame(frames, index)
+    } else {
+        scoreForSecondBowlInNextFrame(frames, index)
+    }
+
+    private fun scoreForFirstBowlInSecondNextFrame(frames: List<String>, index: Int): Int = scoreForNextBowl(frames, index + 1)
 
     private fun Int.isASpare(): Boolean = this == 10
 
@@ -104,7 +109,7 @@ class BowlingScorecardTest {
         else
             scoreForBowl(frames[index + 1].first())
 
-    private fun scoreForSecondNextBowl(frames: List<String>, index: Int): Int =
+    private fun scoreForSecondBowlInNextFrame(frames: List<String>, index: Int): Int =
         if (index == frames.size - 1)
             0
         else
