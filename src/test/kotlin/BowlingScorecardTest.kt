@@ -2,6 +2,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import kotlin.test.assertEquals
+import kotlin.text.contains
 
 class BowlingScorecardTest {
     @Test
@@ -71,54 +72,51 @@ class BowlingScorecardTest {
         assertEquals(30, scoreFor("-- -- -- -- -- -- -- -- -- XXX"))
     }
 
-    private fun scoreFor(scorecard: String): Int =
-        scorecard.split(" ").let { frames ->
-            frames.mapIndexed { index, frame ->
-                frame.simpleScore().let {
-                    it + when {
-                        frame.isAStrike() -> calculateBonusesForStrike(frames, index)
-                        it.isASpare() -> scoreForNextBowl(frames, index)
-                        else -> 0
-                    }
-                }
-            }.sum()
+    private fun scoreFor(scorecard: String): Int {
+        val frames = scorecard.split(" ")
+        return frames.indices.map { index ->
+            Frame(
+                index = index,
+                currentFrame = frames[index],
+                nextFrame = frames.getOrNull(index + 1),
+                secondNextFrame = frames.getOrNull(index + 2),
+            )
+        }
+            .sumOf { it.totalScore }
+    }
+
+    data class Frame(
+        val index: Int,
+        val currentFrame: String,
+        val nextFrame: String?,
+        val secondNextFrame: String?,
+    ) {
+        val simpleScore = currentFrame.sumOf { scoreForBowl(it) }
+        val atLeastASpare = simpleScore == 10
+        val strike = currentFrame.isAStrike()
+
+        private fun nextBowlBonus(): Int {
+            if (!atLeastASpare) return 0
+            return nextFrame?.first()?.let { scoreForBowl(it) } ?: 0
         }
 
-    private fun calculateBonusesForStrike(frames: List<String>, frameIndex: Int): Int =
-        scoreForNextBowl(frames, frameIndex) + scoreForSecondNextBowl(frames, frameIndex)
-
-    private fun scoreForSecondNextBowl(frames: List<String>, index: Int): Int =
-        if (frames.getOrNull(index + 1)?.isAStrike() == true) {
-            scoreForFirstBowlInSecondNextFrame(frames, index)
-        } else {
-            scoreForSecondBowlInNextFrame(frames, index)
+        private fun secondNextBowlBonus(): Int {
+            if (!strike) return 0
+            return when {
+                nextFrame.isAStrike() -> secondNextFrame?.first()?.let { scoreForBowl(it) } ?: 0
+                else -> scoreForBowl(nextFrame?.getOrNull(1) ?: '-')
+            }
         }
 
-    private fun scoreForFirstBowlInSecondNextFrame(frames: List<String>, index: Int): Int =
-        scoreForNextBowl(frames, index + 1)
+        private fun scoreForBowl(ch: Char): Int =
+            when {
+                ch.isDigit() -> ch.digitToInt()
+                ch == 'X' -> 10
+                else -> 0
+            }
 
-    private fun Int.isASpare(): Boolean = this == 10
+        private fun String?.isAStrike(): Boolean = this != null && contains("X")
 
-    private fun String.isAStrike(): Boolean = this.contains("X")
-
-    private fun scoreForNextBowl(frames: List<String>, index: Int): Int =
-        if (index == frames.size - 1)
-            0
-        else
-            scoreForBowl(frames[index + 1].first())
-
-    private fun scoreForSecondBowlInNextFrame(frames: List<String>, index: Int): Int =
-        if (index == frames.size - 1)
-            0
-        else
-            scoreForBowl(frames[index + 1][1])
-
-    private fun String.simpleScore(): Int = map { scoreForBowl(it) }.sum()
-
-    private fun scoreForBowl(ch: Char): Int =
-        when {
-            ch.isDigit() -> ch.digitToInt()
-            ch == 'X' -> 10
-            else -> 0
-        }
+        val totalScore = simpleScore + nextBowlBonus() + secondNextBowlBonus()
+    }
 }
