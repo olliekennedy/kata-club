@@ -63,27 +63,45 @@ class BowlingScorecardTest {
     }
 
     @Test
+    fun `turkey in final frame`() {
+        assertEquals(30, scoreFor("-- -- -- -- -- -- -- -- -- XXX"))
+    }
+
+    @Test
+    fun `two bonuses from final frame`() {
+        assertEquals(40, scoreFor("-- -- -- -- -- -- -- -- X- XX-"))
+    }
+
+    @Test
     fun `random game`() {
         assertEquals(166, scoreFor("52 19 81 X. X. 82 54 X. 91 X91"))
     }
 
     @Test
-    fun `turkey in final frame`() {
-        assertEquals(30, scoreFor("-- -- -- -- -- -- -- -- -- XXX"))
+    fun `handles strike notation`() {
+        assertEquals(166, scoreFor("52 19 81 X. X. 82 54 X. 91 X91"))
     }
 
-    private fun scoreFor(scorecard: String): Int {
-        val frames = scorecard.split(" ")
-        return frames.indices.map { index ->
-            Frame(
-                index = index,
-                currentFrame = frames[index],
-                nextFrame = frames.getOrNull(index + 1),
-                secondNextFrame = frames.getOrNull(index + 2),
-            )
-        }
-            .sumOf { it.totalScore() }
+    @Test
+    fun `handles spare notation`() {
+        assertEquals(152, scoreFor("52 1/ 81 X. X. 8/ 54 X. 9/ 1/5"))
     }
+
+    private fun scoreFor(scorecard: String): Int =
+        scorecard
+            .split(" ")
+            .replaceSpareNotationsWithRealNumbers()
+            .let { frames ->
+                frames.indices.map { index ->
+                    Frame(
+                        index = index,
+                        currentFrame = frames[index],
+                        nextFrame = frames.getOrNull(index + 1),
+                        secondNextFrame = frames.getOrNull(index + 2),
+                    )
+                }
+                    .sumOf { it.totalScore() }
+            }
 
     data class Frame(
         val index: Int,
@@ -120,3 +138,12 @@ class BowlingScorecardTest {
             }
     }
 }
+
+private fun List<String>.replaceSpareNotationsWithRealNumbers() =
+    this.map {
+        it[0] + if (it[1] == '/') {
+            (10 - it[0].digitToInt()).toString()
+        } else {
+            it[1].toString()
+        } + (it.getOrNull(2) ?: "")
+    }
