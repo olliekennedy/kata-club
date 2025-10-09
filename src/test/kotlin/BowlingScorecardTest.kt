@@ -82,7 +82,7 @@ class BowlingScorecardTest {
                 secondNextFrame = frames.getOrNull(index + 2),
             )
         }
-            .sumOf { it.totalScore }
+            .sumOf { it.totalScore() }
     }
 
     data class Frame(
@@ -91,20 +91,24 @@ class BowlingScorecardTest {
         val nextFrame: String?,
         val secondNextFrame: String?,
     ) {
-        val simpleScore = currentFrame.sumOf { scoreForBowl(it) }
-        val atLeastASpare = simpleScore == 10
-        val strike = currentFrame.isAStrike()
+        fun totalScore() = simpleScore + nextBowlBonus() + secondNextBowlBonus()
+
+        private val simpleScore = currentFrame.sumOf { scoreForBowl(it) }
+        private val atLeastASpare = simpleScore == 10
+        private fun String?.isAStrike(): Boolean = this != null && contains("X")
 
         private fun nextBowlBonus(): Int {
             if (!atLeastASpare) return 0
+
             return nextFrame?.first()?.let { scoreForBowl(it) } ?: 0
         }
 
         private fun secondNextBowlBonus(): Int {
-            if (!strike) return 0
+            if (!currentFrame.isAStrike()) return 0
+
             return when {
                 nextFrame.isAStrike() -> secondNextFrame?.first()?.let { scoreForBowl(it) } ?: 0
-                else -> scoreForBowl(nextFrame?.getOrNull(1) ?: '-')
+                else -> nextFrame?.getOrNull(1)?.let { scoreForBowl(it) } ?: 0
             }
         }
 
@@ -114,9 +118,5 @@ class BowlingScorecardTest {
                 ch == 'X' -> 10
                 else -> 0
             }
-
-        private fun String?.isAStrike(): Boolean = this != null && contains("X")
-
-        val totalScore = simpleScore + nextBowlBonus() + secondNextBowlBonus()
     }
 }
