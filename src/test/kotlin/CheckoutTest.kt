@@ -54,13 +54,13 @@ class Basket {
     )
 
     fun total(): Int =
-        items.entries.sumOf { (sku, quantity) ->
-            catalogue[sku]?.let { price ->
+        items.entries.sumOf { (item, count) ->
+            catalogue[item]?.let { price ->
                 price.offer?.let { offer ->
-                    val howManyOffers = quantity / offer.quantity
-                    val countLeft = quantity % offer.quantity
+                    val howManyOffers = count / offer.quantity
+                    val countLeft = count % offer.quantity
                     (offer.price * howManyOffers) + (price.normal * countLeft)
-                } ?: (price.normal * quantity)
+                } ?: (price.normal * count)
             } ?: 0
         }
 
