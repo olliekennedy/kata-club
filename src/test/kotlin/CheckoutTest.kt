@@ -39,33 +39,30 @@ class Basket {
 
     data class Price(
         val normal: Int,
-        val specialOffer: SpecialOffer? = null,
+        val offer: Offer? = null,
     )
 
-    data class SpecialOffer(
+    data class Offer(
         val price: Int,
         val quantity: Int,
     )
 
     val catalogue = mapOf(
-        "A" to Price(50, SpecialOffer(130, 3)),
-        "B" to Price(30, SpecialOffer(50, 2)),
+        "A" to Price(50, Offer(130, 3)),
+        "B" to Price(30, Offer(50, 2)),
         "C" to Price(20),
     )
 
-    fun total(): Int {
-        return items
-            .map { (item, count) ->
-                catalogue[item]?.let { price ->
-                    price.specialOffer?.let { specialOffer ->
-                        val howManySpecialOffers = count / specialOffer.quantity
-                        val countLeft = count % specialOffer.quantity
-                        (specialOffer.price * howManySpecialOffers) + (price.normal * countLeft)
-                    } ?: (price.normal * count)
-                } ?: 0
-            }
-            .sum()
-    }
+    fun total(): Int =
+        items.entries.sumOf { (item, count) ->
+            catalogue[item]?.let { price ->
+                price.offer?.let { offer ->
+                    val howManyOffers = count / offer.quantity
+                    val countLeft = count % offer.quantity
+                    (offer.price * howManyOffers) + (price.normal * countLeft)
+                } ?: (price.normal * count)
+            } ?: 0
+        }
 
     fun add(sku: String) {
         items[sku] = (items[sku] ?: 0) + 1
