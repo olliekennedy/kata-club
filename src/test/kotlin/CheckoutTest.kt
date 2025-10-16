@@ -19,6 +19,8 @@ class CheckoutTest {
                 argumentSet("buy an item on offer and one additional", listOf("A", "A", "A", "A"), 180),
                 argumentSet("buy an item on offer multiple times", listOf("A", "A", "A", "A", "A", "A", "A"), 310),
                 argumentSet("buy another item on offer", listOf("B", "B"), 50),
+                argumentSet("buy two items on offer", listOf("A", "A", "A", "A", "B", "B"), 230),
+                argumentSet("order doesn't matter", listOf("A", "B", "A", "A", "B", "A", "C", "B").shuffled(), 280),
             )
         }
     }
