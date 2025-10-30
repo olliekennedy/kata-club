@@ -26,10 +26,8 @@ fun main() {
                 println("Vote recorded.")
             }
             "2" -> {
-                println("Results:")
-                leagueTable.results().forEach {
-                    println("${it.name}: ${it.rating}")
-                }
+                println("Leaderboard:")
+                println(leagueTable.leaderboard())
             }
             "3" -> {
                 print("Restaurant name: ")
@@ -69,7 +67,7 @@ class LunchLeagueTest {
         leagueTable.vote("Hackney Bridge", "brenda", 10)
 
         assertThat(
-            leagueTable.results(),
+            leagueTable.scores(),
             equalTo(
                 listOf(
                     Entry("Canteen", 6.3),
@@ -119,6 +117,33 @@ class LunchLeagueTest {
 
         assertThat(leagueTable.votingLogFor("Canteen"), equalTo(listOf(Vote("me", 8))))
     }
+
+    @Test
+    fun `can get a nice leaderboard`() {
+        leagueTable.vote("Canteen", "me", 1)
+        leagueTable.vote("Canteen", "bob", 10)
+        leagueTable.vote("Canteen", "sandra", 8)
+        leagueTable.vote("Canteen", "brenda", 6)
+        leagueTable.vote("Randy's Wing Bar", "me", 1)
+        leagueTable.vote("Randy's Wing Bar", "bob", 2)
+        leagueTable.vote("Randy's Wing Bar", "sandra", 3)
+        leagueTable.vote("Randy's Wing Bar", "brenda", 4)
+        leagueTable.vote("Hackney Bridge", "me", 3)
+        leagueTable.vote("Hackney Bridge", "bob", 4)
+        leagueTable.vote("Hackney Bridge", "sandra", 9)
+        leagueTable.vote("Hackney Bridge", "brenda", 10)
+
+        assertThat(
+            leagueTable.leaderboard(),
+            equalTo(
+                """
+                    1. Hackney Bridge 6.5
+                    2. Canteen 6.3
+                    3. Randy's Wing Bar 2.5
+                """.trimIndent()
+            )
+        )
+    }
 }
 
 class LeagueTable() {
@@ -129,7 +154,7 @@ class LeagueTable() {
         restaurantVotes[voter] = rating
     }
 
-    fun results(): List<Entry> =
+    fun scores(): List<Entry> =
         votes.entries.map { (name, votes) ->
             val rating = votes.map { it.value }.average()
             Entry(name, rating)
@@ -139,6 +164,12 @@ class LeagueTable() {
         votes
             .getOrElse(restaurantName) { mapOf() }
             .map { Vote(it.key, it.value) }
+
+    fun leaderboard(): String =
+        scores()
+            .sortedByDescending { it.rating }
+            .mapIndexed { i, it -> "${i + 1}. ${it.name} ${it.rating}" }
+            .joinToString("\n")
 }
 
 private fun List<Int>.average(): Double = sum().div(size.toDouble()).roundedToOneDecimalPlace()
