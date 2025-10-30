@@ -4,6 +4,52 @@ import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
 
+fun main() {
+    val leagueTable = LeagueTable()
+
+    println("Welcome to Lunch League!")
+    while (true) {
+        println("\nChoose an option:")
+        println("1. Vote")
+        println("2. Show results")
+        println("3. Show voting log for a restaurant")
+        println("4. Exit")
+        when (readLine()?.trim()) {
+            "1" -> {
+                print("Restaurant name: ")
+                val restaurant = readLine()?.trim().orEmpty()
+                print("Your name: ")
+                val voter = readLine()?.trim().orEmpty()
+                print("Your rating (1-10): ")
+                val rating = readLine()?.trim()?.toIntOrNull() ?: 0
+                leagueTable.vote(restaurant, voter, rating)
+                println("Vote recorded.")
+            }
+            "2" -> {
+                println("Results:")
+                leagueTable.results().forEach {
+                    println("${it.name}: ${it.rating}")
+                }
+            }
+            "3" -> {
+                print("Restaurant name: ")
+                val restaurant = readLine()?.trim().orEmpty()
+                val log = leagueTable.votingLogFor(restaurant)
+                if (log.isEmpty()) {
+                    println("No votes for $restaurant.")
+                } else {
+                    log.forEach { println("${it.voter}: ${it.rating}") }
+                }
+            }
+            "4" -> {
+                println("Goodbye!")
+                break
+            }
+            else -> println("Invalid option.")
+        }
+    }
+}
+
 class LunchLeagueTest {
     val leagueTable = LeagueTable()
 
