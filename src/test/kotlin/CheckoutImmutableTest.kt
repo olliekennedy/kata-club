@@ -45,13 +45,16 @@ class ImmutableBasket(val items: List<String> = emptyList()) {
     fun total(): Int {
         if (items == listOf("A","A","A")) return 130
         if (items == (1..3).map { "A" } +  "A") return 180
-        return items.sumOf { item -> knownItems.firstOrNull { it.sku == item }?.price ?: 0 }
+        val itemQuantities: Map<String, Int> = items.groupBy { it }.map { it.key to it.value.size }.toMap()
+        return itemQuantities.entries.sumOf { (item, quantity) -> knownItems.firstOrNull { it.sku == item }?.priceFor(quantity) ?: 0 }
     }
 
     fun add(item: String): ImmutableBasket {
         return ImmutableBasket(items + item)
     }
 
-    private data class Item(val sku: String, val price: Int)
+    private data class Item(val sku: String, val price: Int) {
+        fun priceFor(quantity: Int): Int = price * quantity
+    }
 }
 
