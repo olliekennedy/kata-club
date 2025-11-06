@@ -37,15 +37,15 @@ class CheckoutImmutableTest {
 }
 
 class ImmutableBasket(val items: List<String> = emptyList()) {
-    private val knownItems = mapOf(
-        "A" to Item("A", 50),
-        "B" to Item("B", 30),
-        "C" to Item("C", 20),
+    private val knownItems = listOf(
+        Item("A", 50),
+        Item("B", 30),
+        Item("C", 20),
     )
     fun total(): Int {
         if (items == listOf("A","A","A")) return 130
         if (items == (1..3).map { "A" } +  "A") return 180
-        return items.sumOf { knownItems[it]?.price ?: 0 }
+        return items.sumOf { item -> knownItems.firstOrNull { it.sku == item }?.price ?: 0 }
     }
 
     fun add(item: String): ImmutableBasket {
