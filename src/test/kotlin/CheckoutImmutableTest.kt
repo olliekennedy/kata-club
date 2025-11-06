@@ -1,4 +1,3 @@
-import org.example.main
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.argumentSet
@@ -38,18 +37,21 @@ class CheckoutImmutableTest {
 }
 
 class ImmutableBasket(val items: List<String> = emptyList()) {
-    val priceList = mapOf(
-        "A" to 50,
-        "B" to 30,
-        "C" to 20,
+    private val knownItems = mapOf(
+        "A" to Item("A", 50),
+        "B" to Item("B", 30),
+        "C" to Item("C", 20),
     )
     fun total(): Int {
         if (items == listOf("A","A","A")) return 130
         if (items == (1..3).map { "A" } +  "A") return 180
-        return items.sumOf { priceList[it] ?: 0 }
+        return items.sumOf { knownItems[it]?.price ?: 0 }
     }
 
     fun add(item: String): ImmutableBasket {
         return ImmutableBasket(items + item)
     }
+
+    private data class Item(val sku: String, val price: Int)
 }
+
