@@ -1,9 +1,9 @@
 package org.example.lunchleague
 
-import lunchleague.LeagueTable
+import lunchleague.VoteManager
 
 fun main() {
-    val leagueTable = LeagueTable()
+    val voteManager = VoteManager()
 
     println("Welcome to Lunch League!")
     while (true) {
@@ -20,17 +20,17 @@ fun main() {
                 val voter = readLine()?.trim().orEmpty()
                 print("Your rating (1-10): ")
                 val rating = readLine()?.trim()?.toIntOrNull() ?: 0
-                leagueTable.vote(restaurant, voter, rating)
+                voteManager.vote(restaurant, voter, rating)
                 println("Vote recorded.")
             }
             "2" -> {
                 println("Leaderboard:")
-                println(leagueTable.leaderboard())
+                println(voteManager.leaderboard())
             }
             "3" -> {
                 print("Restaurant name: ")
                 val restaurant = readLine()?.trim().orEmpty()
-                val log = leagueTable.votingLogFor(restaurant)
+                val log = voteManager.votingLogFor(restaurant)
                 if (log.isEmpty()) {
                     println("No votes for $restaurant.")
                 } else {

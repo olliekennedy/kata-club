@@ -3,7 +3,7 @@ package lunchleague
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-class LeagueTable() {
+class VoteManager() {
     val votes = mutableMapOf<String, MutableMap<String, Int>>()
 
     fun vote(restaurant: String, voter: String, rating: Int) {
