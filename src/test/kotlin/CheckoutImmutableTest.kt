@@ -12,8 +12,8 @@ class CheckoutImmutableTest {
                 argumentSet("it costs nothing to buy nothing", listOf<String>(), 0),
                 argumentSet("buy a single item", listOf("A"), 50),
                 argumentSet("buy multiple of a single type of item", listOf("A", "A"), 100),
-//                argumentSet("buy two different types of item", listOf("A", "B"), 80),
-//                argumentSet("buy multiple types of item", listOf("A", "B", "C"), 100),
+                argumentSet("buy two different types of item", listOf("A", "B"), 80),
+                argumentSet("buy multiple types of item", listOf("A", "B", "C"), 100),
 //                argumentSet("items not from the shop cost nothing", listOf("?"), 0),
 //                argumentSet("buy an item on offer", listOf("A", "A", "A"), 130),
 //                argumentSet("buy an item on offer and one additional", listOf("A", "A", "A", "A"), 180),
@@ -28,19 +28,22 @@ class CheckoutImmutableTest {
     @ParameterizedTest
     @MethodSource("expectations")
     fun `it costs nothing to buy nothing`(items: List<String>, expected: Int) {
-        var basket = ImmutableBasket()
-
-        items.forEach { basket = basket.add(it) }
+        val basket = items.fold(ImmutableBasket()) { basket, item ->
+            basket.add(item)
+        }
 
         assertEquals(expected, basket.total())
     }
 }
 
-class ImmutableBasket(val itemsCount: Int = 0) {
-
-    fun total(): Int = 50 * itemsCount
+class ImmutableBasket(val itemsCountForA: Int = 0, val itemCountForB: Int = 0) {
+    fun total(): Int = 50 * itemsCountForA + 30 * itemCountForB
 
     fun add(it: String): ImmutableBasket {
-        return ImmutableBasket(itemsCount + 1)
+        return when(it) {
+            "A" -> ImmutableBasket(itemsCountForA + 1, itemCountForB)
+            "B" -> ImmutableBasket(itemsCountForA, itemCountForB + 1)
+            else -> TODO("Kerboom")
+        }
     }
 }
