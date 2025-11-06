@@ -1,3 +1,4 @@
+import org.example.main
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.argumentSet
@@ -14,7 +15,7 @@ class CheckoutImmutableTest {
                 argumentSet("buy multiple of a single type of item", listOf("A", "A"), 100),
                 argumentSet("buy two different types of item", listOf("A", "B"), 80),
                 argumentSet("buy multiple types of item", listOf("A", "B", "C"), 100),
-//                argumentSet("items not from the shop cost nothing", listOf("?"), 0),
+                argumentSet("items not from the shop cost nothing", listOf("?"), 0),
 //                argumentSet("buy an item on offer", listOf("A", "A", "A"), 130),
 //                argumentSet("buy an item on offer and one additional", listOf("A", "A", "A", "A"), 180),
 //                argumentSet("buy an item on offer multiple times", listOf("A", "A", "A", "A", "A", "A", "A"), 310),
@@ -36,14 +37,15 @@ class CheckoutImmutableTest {
     }
 }
 
-class ImmutableBasket(val itemsCountForA: Int = 0, val itemCountForB: Int = 0) {
-    fun total(): Int = 50 * itemsCountForA + 30 * itemCountForB
+class ImmutableBasket(val items: List<String> = emptyList()) {
+    val priceList = mapOf(
+        "A" to 50,
+        "B" to 30,
+        "C" to 20,
+    )
+    fun total(): Int = items.sumOf { priceList[it] ?: 0 }
 
-    fun add(it: String): ImmutableBasket {
-        return when(it) {
-            "A" -> ImmutableBasket(itemsCountForA + 1, itemCountForB)
-            "B" -> ImmutableBasket(itemsCountForA, itemCountForB + 1)
-            else -> TODO("Kerboom")
-        }
+    fun add(item: String): ImmutableBasket {
+        return ImmutableBasket(items + item)
     }
 }
