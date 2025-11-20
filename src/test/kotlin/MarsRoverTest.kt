@@ -128,6 +128,21 @@ class MarsRoverTest {
         assertThat(rover.direction, equalTo(Direction.NORTH))
     }
 
+    @Test
+    fun `go on a journey`() {
+        val rover = Rover(startingPosition = Coordinate(x = 0, y = 0), startingDirection = Direction.SOUTH)
+
+        rover.moveForward()
+        rover.moveForward()
+        rover.rotateLeft()
+        rover.moveForward()
+        rover.moveForward()
+        rover.rotateRight()
+
+        assertThat(rover.position, equalTo(Coordinate(x = 2, y = 2)))
+        assertThat(rover.direction, equalTo(Direction.SOUTH))
+    }
+
     companion object {
         @JvmStatic
         fun rotateLeft(): List<Arguments?> {
