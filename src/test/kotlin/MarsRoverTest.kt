@@ -21,6 +21,16 @@ class MarsRoverTest {
         assertThat(rover.position, equalTo(Coordinate(x = 0, y = 2)))
         assertThat(rover.direction, equalTo(Direction.SOUTH))
     }
+
+    @Test
+    fun `move a rover one move backward`() {
+        val rover = Rover(startingPosition = Coordinate(x = 0, y = 1), startingDirection = Direction.SOUTH)
+
+        rover.moveBackward()
+
+        assertThat(rover.position, equalTo(Coordinate(x = 0, y = 0)))
+        assertThat(rover.direction, equalTo(Direction.SOUTH))
+    }
 }
 
 enum class Direction {
@@ -30,6 +40,10 @@ enum class Direction {
 class Rover(startingPosition: Coordinate, startingDirection: Direction) {
     fun moveForward() {
         position = position.copy(y = position.y + 1)
+    }
+
+    fun moveBackward() {
+        position = position.copy(y = position.y - 1)
     }
 
     var position: Coordinate = startingPosition
