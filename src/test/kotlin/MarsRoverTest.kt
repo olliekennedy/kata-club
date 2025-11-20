@@ -53,7 +53,7 @@ class MarsRoverTest {
     }
 
     @Test
-    fun `move EAST`() {
+    fun `move forward EAST`() {
         val rover = Rover(startingPosition = Coordinate(x = 0, y = 1), startingDirection = Direction.EAST)
 
         rover.moveForward()
@@ -63,7 +63,7 @@ class MarsRoverTest {
     }
 
     @Test
-    fun `move WEST`() {
+    fun `move forward WEST`() {
         val rover = Rover(startingPosition = Coordinate(x = 1, y = 0), startingDirection = Direction.WEST)
 
         rover.moveForward()
@@ -73,12 +73,42 @@ class MarsRoverTest {
     }
 
     @Test
-    fun `move NORTH`() {
+    fun `move forward NORTH`() {
         val rover = Rover(startingPosition = Coordinate(x = 0, y = 1), startingDirection = Direction.NORTH)
 
         rover.moveForward()
 
         assertThat(rover.position, equalTo(Coordinate(x = 0, y = 0)))
+        assertThat(rover.direction, equalTo(Direction.NORTH))
+    }
+
+    @Test
+    fun `move backward facing EAST`() {
+        val rover = Rover(startingPosition = Coordinate(x = 1, y = 0), startingDirection = Direction.EAST)
+
+        rover.moveBackward()
+
+        assertThat(rover.position, equalTo(Coordinate(x = 0, y = 0)))
+        assertThat(rover.direction, equalTo(Direction.EAST))
+    }
+
+    @Test
+    fun `move backward facing WEST`() {
+        val rover = Rover(startingPosition = Coordinate(x = 0, y = 0), startingDirection = Direction.WEST)
+
+        rover.moveBackward()
+
+        assertThat(rover.position, equalTo(Coordinate(x = 1, y = 0)))
+        assertThat(rover.direction, equalTo(Direction.WEST))
+    }
+
+    @Test
+    fun `move backward facing NORTH`() {
+        val rover = Rover(startingPosition = Coordinate(x = 0, y = 0), startingDirection = Direction.NORTH)
+
+        rover.moveBackward()
+
+        assertThat(rover.position, equalTo(Coordinate(x = 0, y = 1)))
         assertThat(rover.direction, equalTo(Direction.NORTH))
     }
 }
@@ -101,9 +131,11 @@ class Rover(startingPosition: Coordinate, startingDirection: Direction) {
     }
 
     fun moveBackward() {
-        when (direction) {
-            Direction.SOUTH -> position = position.copy(y = position.y - 1)
-            else -> TODO()
+        position = when (direction) {
+            Direction.SOUTH -> position.copy(y = position.y - 1)
+            Direction.NORTH -> position.copy(y = position.y + 1)
+            Direction.EAST -> position.copy(x = position.x - 1)
+            Direction.WEST -> position.copy(x = position.x + 1)
         }
     }
 
