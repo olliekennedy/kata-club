@@ -41,11 +41,22 @@ class MarsRoverTest {
         assertThat(rover.position, equalTo(Coordinate(x = 0, y = 1)))
         assertThat(rover.direction, equalTo(Direction.EAST))
     }
+
+    @Test
+    fun `rotate a rover right`() {
+        val rover = Rover(startingPosition = Coordinate(x = 0, y = 1), startingDirection = Direction.SOUTH)
+
+        rover.rotateRight()
+
+        assertThat(rover.position, equalTo(Coordinate(x = 0, y = 1)))
+        assertThat(rover.direction, equalTo(Direction.WEST))
+    }
 }
 
 enum class Direction {
     SOUTH,
     EAST,
+    WEST,
 }
 
 class Rover(startingPosition: Coordinate, startingDirection: Direction) {
@@ -60,6 +71,13 @@ class Rover(startingPosition: Coordinate, startingDirection: Direction) {
     fun rotateLeft() {
         when (direction) {
             Direction.SOUTH -> direction = Direction.EAST
+            else -> TODO()
+        }
+    }
+
+    fun rotateRight() {
+        when (direction) {
+            Direction.SOUTH -> direction = Direction.WEST
             else -> TODO()
         }
     }
