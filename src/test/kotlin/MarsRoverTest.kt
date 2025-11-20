@@ -61,11 +61,17 @@ enum class Direction {
 
 class Rover(startingPosition: Coordinate, startingDirection: Direction) {
     fun moveForward() {
-        position = position.copy(y = position.y + 1)
+        when (direction) {
+            Direction.SOUTH -> position = position.copy(y = position.y + 1)
+            else -> TODO()
+        }
     }
 
     fun moveBackward() {
-        position = position.copy(y = position.y - 1)
+        when (direction) {
+            Direction.SOUTH -> position = position.copy(y = position.y - 1)
+            else -> TODO()
+        }
     }
 
     fun rotateLeft() {
