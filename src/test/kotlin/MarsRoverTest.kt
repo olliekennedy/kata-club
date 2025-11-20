@@ -47,6 +47,17 @@ class MarsRoverTest {
         assertThat(rover.direction, equalTo(result))
     }
 
+    @ParameterizedTest
+    @MethodSource("rotateRight")
+    fun `rotate a rover right`(starting: Direction, result: Direction) {
+        val rover = Rover(startingPosition = Coordinate(x = 0, y = 1), startingDirection = starting)
+
+        rover.rotateRight()
+
+        assertThat(rover.position, equalTo(Coordinate(x = 0, y = 1)))
+        assertThat(rover.direction, equalTo(result))
+    }
+
     @Test
     fun `rotate a rover right`() {
         val rover = Rover(startingPosition = Coordinate(x = 0, y = 1), startingDirection = Direction.SOUTH)
@@ -127,6 +138,16 @@ class MarsRoverTest {
                 arguments(Direction.EAST, Direction.NORTH),
             )
         }
+
+        @JvmStatic
+        fun rotateRight(): List<Arguments?> {
+            return listOf(
+                arguments(Direction.NORTH, Direction.EAST),
+                arguments(Direction.EAST, Direction.SOUTH),
+                arguments(Direction.SOUTH, Direction.WEST),
+                arguments(Direction.WEST, Direction.NORTH),
+            )
+        }
     }
 }
 
@@ -166,8 +187,11 @@ class Rover(startingPosition: Coordinate, startingDirection: Direction) {
     }
 
     fun rotateRight() {
-        when (direction) {
-            Direction.SOUTH -> direction = Direction.WEST
+        direction = when (direction) {
+            Direction.SOUTH -> Direction.WEST
+            Direction.EAST -> Direction.SOUTH
+            Direction.NORTH -> Direction.EAST
+            Direction.WEST -> Direction.NORTH
             else -> TODO()
         }
     }
