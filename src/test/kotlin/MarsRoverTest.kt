@@ -192,7 +192,6 @@ class Rover(startingPosition: Coordinate, startingDirection: Direction) {
             Direction.EAST -> Direction.SOUTH
             Direction.NORTH -> Direction.EAST
             Direction.WEST -> Direction.NORTH
-            else -> TODO()
         }
     }
 
