@@ -1,6 +1,10 @@
 import com.natpryce.hamkrest.assertion.assertThat
 import com.natpryce.hamkrest.equalTo
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 class MarsRoverTest {
 
@@ -32,14 +36,15 @@ class MarsRoverTest {
         assertThat(rover.direction, equalTo(Direction.SOUTH))
     }
 
-    @Test
-    fun `rotate a rover left`() {
-        val rover = Rover(startingPosition = Coordinate(x = 0, y = 1), startingDirection = Direction.SOUTH)
+    @ParameterizedTest
+    @MethodSource("rotateLeft")
+    fun `rotate a rover left`(starting: Direction, result: Direction) {
+        val rover = Rover(startingPosition = Coordinate(x = 0, y = 1), startingDirection = starting)
 
         rover.rotateLeft()
 
         assertThat(rover.position, equalTo(Coordinate(x = 0, y = 1)))
-        assertThat(rover.direction, equalTo(Direction.EAST))
+        assertThat(rover.direction, equalTo(result))
     }
 
     @Test
@@ -111,6 +116,18 @@ class MarsRoverTest {
         assertThat(rover.position, equalTo(Coordinate(x = 0, y = 1)))
         assertThat(rover.direction, equalTo(Direction.NORTH))
     }
+
+    companion object {
+        @JvmStatic
+        fun rotateLeft(): List<Arguments?> {
+            return listOf(
+                arguments(Direction.NORTH, Direction.WEST),
+                arguments(Direction.WEST, Direction.SOUTH),
+                arguments(Direction.SOUTH, Direction.EAST),
+                arguments(Direction.EAST, Direction.NORTH),
+            )
+        }
+    }
 }
 
 enum class Direction {
@@ -140,9 +157,11 @@ class Rover(startingPosition: Coordinate, startingDirection: Direction) {
     }
 
     fun rotateLeft() {
-        when (direction) {
-            Direction.SOUTH -> direction = Direction.EAST
-            else -> TODO()
+        direction = when (direction) {
+            Direction.SOUTH -> Direction.EAST
+            Direction.EAST -> Direction.NORTH
+            Direction.NORTH -> Direction.WEST
+            Direction.WEST -> Direction.SOUTH
         }
     }
 
