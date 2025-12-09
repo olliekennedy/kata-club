@@ -143,6 +143,25 @@ class MarsRoverTest {
         assertThat(rover.direction, equalTo(Direction.SOUTH))
     }
 
+    @Test
+    fun `show a current map`() {
+        val rover = Rover(startingPosition = Coordinate(x = 3, y = 5), startingDirection = Direction.EAST)
+
+        val result = rover.showMap()
+
+        val expected = """          
+          
+          
+  >       
+          
+          
+          
+          
+          
+          """
+        assertThat(result, equalTo(expected))
+    }
+
     companion object {
         @JvmStatic
         fun rotateLeft(): List<Arguments?> {
@@ -208,6 +227,35 @@ class Rover(startingPosition: Coordinate, startingDirection: Direction) {
             Direction.NORTH -> Direction.EAST
             Direction.WEST -> Direction.NORTH
         }
+    }
+
+    fun showMap(): String {
+        val twoDeeMap = mutableListOf(
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+            mutableListOf(" ", " ", " ", " ", " ", " ", " ", " ", " ", " "),
+        )
+
+        var output = ""
+
+        for (j in 0..9) {
+            for (i in 0..9) {
+                if (i == position.x && j == position.y) {
+                    output = output + ">"
+                } else {
+                    output = output + " "
+                }
+            }
+            output = output + "\n"
+        }
+        return output
     }
 
     var position: Coordinate = startingPosition
